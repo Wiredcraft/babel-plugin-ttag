@@ -4,7 +4,7 @@ import dedent from 'dedent';
 import generate from '@babel/generator';
 import tpl from '@babel/template';
 
-import { DISABLE_COMMENT, TTAGID, TTAG_MACRO_ID, INTERNAL_TTAG_MACRO_ID } from './defaults';
+import { DISABLE_COMMENT, TTAGID, TTAG_MACRO_ID, INTERNAL_TTAG_MACRO_ID, OMNI_ID } from './defaults';
 import { ValidationError, NoExpressionError } from './errors';
 
 
@@ -137,6 +137,12 @@ export function isTtagImport(node) {
         node.source.value === INTERNAL_TTAG_MACRO_ID;
 }
 
+export function isOmniImport(node) {
+    return node.source.value === OMNI_ID ||
+        node.source.value === TTAG_MACRO_ID ||
+        node.source.value === INTERNAL_TTAG_MACRO_ID;
+}
+
 export function isTtagRequire(node) {
     return bt.isCallExpression(node.init) &&
         node.init.callee.name === 'require' &&
@@ -145,6 +151,41 @@ export function isTtagRequire(node) {
         (node.init.arguments[0].value === TTAGID ||
             node.init.arguments[0].value === TTAG_MACRO_ID ||
             node.init.arguments[0].value === INTERNAL_TTAG_MACRO_ID);
+}
+
+export function isUsingTranslationsCall(node) {
+    return bt.isCallExpression(node.init) &&
+        node.init.callee.name === 'useTranslations' &&
+        bt.isIdentifier(node.id);
+}
+
+export function isComposingRawTranslateHelperCall(node) {
+    return bt.isCallExpression(node.init) &&
+        node.init.callee.name === 'composeRawTranslateHelper' &&
+        bt.isIdentifier(node.id);
+}
+
+/** Extract NAMESPACE from useTranslations(<namespace>) */
+export function extractFuncParamValue(node) {
+    if (!(bt.isCallExpression(node.init) &&
+        node.init.arguments &&
+        node.init.arguments.length > 0)) return [];
+
+    const firstArg = node.init.arguments[0];
+    if (firstArg.type === 'StringLiteral') {
+        return [firstArg.value];
+    } else if (firstArg.type === 'ArrayExpression') {
+        return firstArg.elements.map((ele) => ele.value);
+    }
+    return [];
+}
+
+export function extractFuncDestructVars(nodePath) {
+    return nodePath
+            .parent
+            .declarations
+            .filter((d) => bt.isMemberExpression(d.init))
+            .map((d) => d.id.name);
 }
 
 export function hasImportSpecifier(node) {

@@ -30,6 +30,7 @@ function logAction(message, level = SKIP) {
 }
 
 class C3poContext {
+    // TODO: Support namespace
     constructor(config) {
         this.config = config || {};
         const [validationResult, errorsText] = validateConfig(this.config, configSchema);
@@ -47,6 +48,7 @@ class C3poContext {
     clear() {
         this.aliases = {};
         this.imports = new Set();
+        this.namespaces = new Set();
     }
 
     getAliasesForFunc(ttagFuncName) {
@@ -88,6 +90,18 @@ class C3poContext {
 
     addImport(importName) {
         this.imports.add(importName);
+    }
+
+    setNamespaces(namespaces) {
+        this.namespaces = namespaces;
+    }
+
+    hasNamespace(namespace) {
+        this.namespaces.has(namespace);
+    }
+
+    addNamespace(namespace) {
+        this.namespaces.add(namespace);
     }
 
     getExtractors() {

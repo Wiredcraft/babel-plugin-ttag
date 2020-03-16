@@ -4,6 +4,8 @@ import { ast2Str } from './utils';
 const NAME = 'context';
 
 export function isContextTagCall(node, context) {
+    // return true;
+    debugger;
     return (
     t.isTaggedTemplateExpression(node) &&
     t.isMemberExpression(node.tag) &&
@@ -40,18 +42,18 @@ export function isValidFnCallContext(nodePath) {
 }
 
 export function isValidTagContext(nodePath) {
-    const node = nodePath.node;
-    const argsLength = node.tag.object.arguments.length;
+    // const node = nodePath.node;
+    // const argsLength = node.tag.object.arguments.length;
 
-    if (argsLength !== 1) {
-        throw nodePath.buildCodeFrameError(`Context function accepts only 1 argument but has ${argsLength} instead.`);
-    }
+    // if (argsLength !== 1) {
+    //     throw nodePath.buildCodeFrameError(`Context function accepts only 1 argument but has ${argsLength} instead.`);
+    // }
 
-    const contextStr = node.tag.object.arguments[0];
+    // const contextStr = node.tag.object.arguments[0];
 
-    if (! t.isLiteral(contextStr)) {
-        throw nodePath.buildCodeFrameError(`Expected string as a context argument. Actual - "${ast2Str(contextStr)}".`);
-    }
+    // if (! t.isLiteral(contextStr)) {
+    //     throw nodePath.buildCodeFrameError(`Expected string as a context argument. Actual - "${ast2Str(contextStr)}".`);
+    // }
 
     return true;
 }

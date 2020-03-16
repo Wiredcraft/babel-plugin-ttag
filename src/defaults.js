@@ -11,6 +11,7 @@ export const FUNC_TO_ALIAS_MAP = {
     ngettext: 'ngettext',
     msgid: 'msgid',
     context: 'c',
+    useTranslations: 'useTranslations',
 };
 
 export const ALIAS_TO_FUNC_MAP = Object.keys(FUNC_TO_ALIAS_MAP).reduce((obj, key) => {
@@ -38,9 +39,11 @@ export const UNRESOLVED_ACTION = {
     SKIP: 'skip',
 };
 
-export const DISABLE_COMMENT = 'disable ttag';
+// export const DISABLE_COMMENT = 'disable ttag';
+export const DISABLE_COMMENT = 'disable t';
 
 export const TTAGID = 'ttag';
+export const OMNI_ID = '@oaui/common';
 export const TTAG_MACRO_ID = 'ttag.macro';
 export const INTERNAL_TTAG_MACRO_ID = 'babel-plugin-ttag/dist/ttag.macro';
 
