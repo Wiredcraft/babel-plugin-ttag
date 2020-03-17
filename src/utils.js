@@ -180,12 +180,59 @@ export function extractFuncParamValue(node) {
     return [];
 }
 
+/**
+ * For each declaration
+ {
+    "type": "VariableDeclarator",
+    "id": {
+      "type": "Identifier",
+      "start": 451,
+      "end": 453,
+      "loc": {
+        "start": {
+          "line": 18,
+          "column": 16
+        },
+        "end": {
+          "line": 18,
+          "column": 18
+        },
+        "identifierName": "tt"
+      },
+      "name": "tt"
+    },
+    "init": {
+      "type": "MemberExpression",
+      "object": {
+        "type": "Identifier",
+        "name": "_useTranslations"
+      },
+      "property": {
+        "type": "Identifier",
+        "name": "t",
+        "loc": {
+          "start": {
+            "line": 18,
+            "column": 13
+          },
+          "end": {
+            "line": 18,
+            "column": 14
+          },
+          "identifierName": "t"
+        }
+      },
+      "computed": false,
+      "optional": null
+    }
+  }
+ */
 export function extractFuncDestructVars(nodePath) {
     return nodePath
             .parent
             .declarations
             .filter((d) => bt.isMemberExpression(d.init))
-            .map((d) => d.id.name);
+            .map((d) => ({ member: d.init.property.name, local: d.id.name }));
 }
 
 export function hasImportSpecifier(node) {

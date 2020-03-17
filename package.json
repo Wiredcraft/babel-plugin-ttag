@@ -1,7 +1,7 @@
 {
-  "name": "babel-plugin-ttag",
-  "version": "1.7.24",
-  "description": "",
+  "name": "@wiredcraft/babel-plugin-ttag",
+  "version": "0.0.1",
+  "description": "Based on babel-plugin-ttag#1.7.24",
   "main": "dist/plugin.js",
   "keywords": [
     "gettext",
@@ -19,14 +19,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ttag-org/babel-plugin-ttag.git"
+    "url": "git+https://github.com/wiredcraft/babel-plugin-ttag.git"
   },
   "author": "alexander",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ttag-org/babel-plugin-ttag/issues"
+    "url": "https://github.com/wiredcraft/babel-plugin-ttag/issues"
   },
-  "homepage": "https://github.com/ttag-org/babel-plugin-ttag#readme",
+  "homepage": "https://github.com/wiredcraft/babel-plugin-ttag#readme",
   "dependencies": {
     "@babel/generator": "^7.0.0",
     "@babel/template": "^7.0.0",

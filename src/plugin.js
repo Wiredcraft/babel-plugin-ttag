@@ -48,7 +48,7 @@ export default function () {
     function tryMatchCall(cb) {
         return (nodePath, state) => {
             const node = nodePath.node;
-            console.log('tryMatchCall _node', node.type);
+            console.log('tryMatchCall _node', JSON.stringify(node.callee));
             if (isContextFnCall(node, context) && isValidFnCallContext(nodePath)) {
                 nodePath._C3PO_GETTEXT_CONTEXT = node.callee.object.arguments[0].value;
                 nodePath._ORIGINAL_NODE = node;
@@ -104,7 +104,7 @@ export default function () {
 
     return {
         post() {
-            console.log('extractOrResolve post()');
+            console.log('plugin post()');
 
             if (context && context.isExtractMode() && potEntries.length) {
                 const poData = buildPotData(potEntries);
@@ -220,17 +220,23 @@ export default function () {
                         nodePath.remove();
                     }
                 } else if (isUsingTranslationsCall(node) || isComposingRawTranslateHelperCall(node)) {
+                    // FOR: const { t } = useTranslations(<namespaces>);
                     const namespaces = extractFuncParamValue(node);
                     const destructVars = extractFuncDestructVars(nodePath);
-                    if (destructVars.includes('t')) {
-                        // context.addAlias(ALIAS_TO_FUNC_MAP[imported.name], local.name);
-                        // context.addImport(local.name);
-                        // context.addAlias(ALIAS_TO_FUNC_MAP.t, 't');
-                        context.addImport('t');
+                    console.log('destructVars', destructVars);
+                    destructVars.filter((v) => ['t', 'jt'].includes(v.member)).forEach((v) => {
+                        if (v.member !== v.local) {
+                            // FOR const Aliases
+                            console.log(`context.addAlias(ALIAS_TO_FUNC_MAP[v.member ${ALIAS_TO_FUNC_MAP[v.member]}], v.local ${v.local});`);
+                            context.addAlias(ALIAS_TO_FUNC_MAP[v.member], v.local);
+                            console.log(`context.addImport(v.local ${v.local});`);
+                            context.addImport(v.local);
+                        } else {
+                            console.log(`context.addImport(v.member ${v.local});`);
+                            context.addImport(v.member);
+                        }
                         context.setNamespaces(namespaces);
-                    }
-                    // console.log('useTranslations namespaces node', namespaces, JSON.stringify(node, null, 2), '\n\nnodePath', nodePath, '\n\nstate', state);
-                    // console.log('nodePath parent declarations', nodePath.parent.declarations);
+                    });
                 }
             },
             /** For
