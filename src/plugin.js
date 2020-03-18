@@ -30,12 +30,7 @@ export default function () {
     function tryMatchTag(cb) {
         return (nodePath, state) => {
             const node = nodePath.node;
-            console.log('tryMatchTag _node', node.type/* node, '_context', context, '_nodePath', nodePath*/);
-            // console.log('node.tag.object', node.tag.object);
-            const _isContextTagCall = isContextTagCall(node, context);
-            const _isValidTagContext = isValidTagContext(nodePath);
-            console.log('tryMatchTag _isContextTagCall', _isContextTagCall, '_isValidTagContext', _isValidTagContext);
-            if (_isContextTagCall && _isValidTagContext) {
+            if (isContextTagCall(node, context) && isValidTagContext(nodePath)) {
                 nodePath._C3PO_GETTEXT_CONTEXT = node.tag.object.arguments[0].value;
                 nodePath._ORIGINAL_NODE = node;
                 nodePath.node = bt.taggedTemplateExpression(node.tag.property, node.quasi);
@@ -48,7 +43,6 @@ export default function () {
     function tryMatchCall(cb) {
         return (nodePath, state) => {
             const node = nodePath.node;
-            console.log('tryMatchCall _node', JSON.stringify(node.callee));
             if (isContextFnCall(node, context) && isValidFnCallContext(nodePath)) {
                 nodePath._C3PO_GETTEXT_CONTEXT = node.callee.object.arguments[0].value;
                 nodePath._ORIGINAL_NODE = node;
@@ -60,7 +54,6 @@ export default function () {
     }
 
     function extractOrResolve(nodePath, state) {
-        console.log('extractOrResolve');
         if (isInDisabledScope(nodePath, disabledScopes)) {
             return;
         }
@@ -104,8 +97,6 @@ export default function () {
 
     return {
         post() {
-            console.log('plugin post()');
-
             if (context && context.isExtractMode() && potEntries.length) {
                 const poData = buildPotData(potEntries);
 
@@ -167,8 +158,6 @@ export default function () {
             CallExpression: tryMatchCall(extractOrResolve),
             /** For script file start point */
             Program: (nodePath, state) => {
-                console.log('Program');
-
                 started = true;
                 if (!context) {
                     context = new TtagContext(state.opts);
@@ -181,7 +170,6 @@ export default function () {
                 }
             },
             BlockStatement: (nodePath) => {
-                console.log('BlockStatement');
                 if (hasDisablingComment(nodePath.node)) {
                     disabledScopes.add(nodePath.scope.uid);
                 }
@@ -190,7 +178,6 @@ export default function () {
              * const { t } = useTranslations(<namespace>);
              */
             VariableDeclarator: (nodePath, state) => {
-                console.log('VariableDeclarator');
                 const { node } = nodePath;
                 // if (!isTtagRequire(node)) return;
                 if (isTtagRequire(node)) {
@@ -223,16 +210,12 @@ export default function () {
                     // FOR: const { t } = useTranslations(<namespaces>);
                     const namespaces = extractFuncParamValue(node);
                     const destructVars = extractFuncDestructVars(nodePath);
-                    console.log('destructVars', destructVars);
                     destructVars.filter((v) => ['t', 'jt'].includes(v.member)).forEach((v) => {
                         if (v.member !== v.local) {
                             // FOR const Aliases
-                            console.log(`context.addAlias(ALIAS_TO_FUNC_MAP[v.member ${ALIAS_TO_FUNC_MAP[v.member]}], v.local ${v.local});`);
                             context.addAlias(ALIAS_TO_FUNC_MAP[v.member], v.local);
-                            console.log(`context.addImport(v.local ${v.local});`);
                             context.addImport(v.local);
                         } else {
-                            console.log(`context.addImport(v.member ${v.local});`);
                             context.addImport(v.member);
                         }
                         context.setNamespaces(namespaces);
@@ -243,7 +226,6 @@ export default function () {
              * import { useTranslations } from '@oaui/common';
              */
             ImportDeclaration: (nodePath, state) => {
-                console.log('ImportDeclaration');
                 const { node } = nodePath;
                 if (!isOmniImport(node) && !isTtagImport(node)) return;
                 if (!context) {
@@ -261,7 +243,6 @@ export default function () {
                         return hasAlias;
                     })
                     .forEach(({ imported, local }) => {
-                        console.log(`context.addAlias(ALIAS_TO_FUNC_MAP[imported.name(${imported.name})], local.name(${local.name}))`);
                         // TODO: Wait until const { t } = useTranslations(); then addAlias
                         context.addAlias(ALIAS_TO_FUNC_MAP[imported.name], local.name);
                         context.addImport(local.name);

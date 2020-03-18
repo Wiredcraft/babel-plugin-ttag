@@ -1,6 +1,6 @@
 {
   "name": "@wiredcraft/babel-plugin-ttag",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Based on babel-plugin-ttag#1.7.24",
   "main": "dist/plugin.js",
   "keywords": [
